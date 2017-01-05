@@ -1,21 +1,21 @@
 package com.study_gradle;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-
-import com.dev.DevClass;
+import android.widget.TextView;
 
 /**
  * @author 张全
  */
 
-public class ChildActivity extends Activity {
+public class DevActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dev);
-        new DevClass().test();
-        startActivity(new Intent(this,DevActivity.class));
+       TextView textView= (TextView) findViewById(R.id.textview);
+        textView.setText("DevActivity");
+        textView.setTextColor(Color.RED);
     }
 }

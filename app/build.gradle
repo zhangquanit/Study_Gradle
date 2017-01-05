@@ -137,9 +137,7 @@ android {
             // Android Lollipop without time consuming dex merging processes.
             minSdkVersion 21
             applicationId 'com.study.gradle.dev'
-            proguardFile 'D:/terry/workspace/android_studio/open_sources/Gradle/Study_Gradle/app/proguard-rules.pro'
             targetSdkVersion 25
-            testApplicationId 'com.study.gradle.dev.test'
             versionCode 10
             versionName '1.0'
             versionNameSuffix 'dev'
@@ -207,7 +205,7 @@ dependencies {
      */
     //    debugCompile ""    //debug的依赖
     //对于flavor=dev的依赖   选择BuildVariants=devDebug或devRelease 构建下会编译依赖库
-    devCompile 'com.google.guava:guava:21.0-rc2'
+//    devCompile 'com.google.guava:guava:21.0-rc2'
 //    devDebugCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devDebug下会编译依赖库
 //    devReleaseCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devRelease下会编译依赖库
 

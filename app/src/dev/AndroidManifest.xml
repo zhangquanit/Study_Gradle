@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- activity最好配置全名-->
+    <application>
+        <activity android:name="com.study_gradle.DevActivity"
+            android:label="DevActivity"
+            />
+    </application>
+
+
+</manifest>
