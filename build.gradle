@@ -1,0 +1,54 @@
+/**
+ * 这个文件是整个项目的gradle基础配置文件
+ * 内容主要包含了两个方面：一个是声明仓库的源，这里可以看到是指明的jcenter(), 之前版本则是mavenCentral(),
+ * jcenter可以理解成是一个新的中央远程仓库，兼容maven中心仓库，而且性能更优。另一个是声明了android gradle plugin的版本
+  */
+apply from: 'buildsystem/dependencies.gradle'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        /**
+         设置第三方maven仓库，主要是配置url这个参数
+         maven {
+             url 'http://repo.xxxx.net/nexus/'
+             name 'maven name'
+             credentials {
+                 username = 'username'
+                 password = 'password'
+             }
+         }
+         其中name和credentials是可选项，视具体情况而定。
+         */
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+    //全局设定编码
+    tasks.withType(JavaCompile){
+        options.encoding = "UTF-8"
+    }
+    /**
+     * 剔除task
+     * Gradle每次构建时都执行了许多的task，其中或许有一些task是我们不需要的，可以把它们都屏蔽掉
+     * 比如 我们在build时跳过包含AndroidTest和Test关键字的task
+     */
+//    tasks.whenTaskAdded { task ->
+//        if (task.name.contains('AndroidTest') || task.name.contains('Test')) {
+//            task.enabled = false
+//        }
+//    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+

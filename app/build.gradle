@@ -1,0 +1,259 @@
+apply plugin: 'com.android.application'
+
+//定义打包时间
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+def config = rootProject.ext;
+android {
+    compileSdkVersion config.compileSdkVersion
+    buildToolsVersion config.buildToolsVersion
+
+    useLibrary "org.apache.http.legacy"  //支持httpclient请求
+
+    //属于Flavors的默认配置。
+    defaultConfig {
+        //应用包名  注意与Manifest.xml文件中packagenName的区别
+        applicationId "com.study.gradle" //默认包名
+        testApplicationId 'com.study.gradle.test'
+        minSdkVersion config.minSdkVersion
+        targetSdkVersion config.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        // dex突破65535的限制
+        multiDexEnabled true
+
+
+//        ndk {
+//            // 设置支持的 SO 库构架
+//            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64', 'mips', 'mips64'
+//        }
+
+        //替换AndroidManifest中的占位符
+        manifestPlaceholders = [
+                UMENG_CHANNEL_VALUE: "umeng",
+                SCHEME             : "bbchexian_default"
+        ]
+        //自定义BuildConfig字段
+        buildConfigField "boolean", "LOG_DEBUG", "true"
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug' // 设置debug时的包名为com.study.gradle.debug
+
+            //自定义BuildConfig字段
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            //替换AndroidManifest中的占位符
+            manifestPlaceholders = [SCHEME: "bbchexian_debug"]
+            //versionName的后缀
+            versionNameSuffix "-debug"
+            signingConfig signingConfigs.debug
+        }
+        release {
+            //自定义BuildConfig字段
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            //替换AndroidManifest中的占位符
+            manifestPlaceholders = [SCHEME: "bbchexian_release"]
+
+            //是否进行混淆
+            minifyEnabled true
+            /**
+             混淆文件的位置
+             proguardFiles这部分有两段，前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，免去了我们很多事，
+             这个文件的目录在 sdk/tools/proguard/proguard-android.txt , 后一部分是我们项目里的自定义的混淆文件,文件名可自定义，默认为proguard-rules.pro
+             最终混淆的结果是这两部分文件共同作用的。
+             */
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // 移除无用的resource文件
+            shrinkResources true
+            //release版本使用的签名
+            signingConfig signingConfigs.debug
+            //打包的apk名称
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        // 输出apk名称为app_v1.0_2015-01-15_wandoujia.apk
+//                        def fileName = "app_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+//                        output.outputFile = new File(outputFile.parent, fileName)
+//                    }
+//                }
+//            }
+        }
+        /**
+         * 如果我们想要新增加一个buildType，又想要新的buildType继承之前配置好的参数，就可以用init.with()
+         * 同理，init.with()还适用于其它配置
+         */
+        rtm.initWith(buildTypes.release) // 继承release的配置
+        rtm {}
+    }
+    //-----------------设置java版本-----------------
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    //-----------------多渠道打包-----------------
+    /**
+     * 第一步 在AndroidManifest.xml里配置PlaceHolder
+     <meta-data
+     android:name="UMENG_CHANNEL"
+     android:value="${UMENG_CHANNEL_VALUE}" />
+
+     第二步 统一替换AndroidManifest中的占位符
+     */
+//    productFlavors {
+//        xiaomi {
+//            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "xiaomi"]
+//        }
+//        wandoujia {
+//            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wandoujia"]
+//        }
+//    }
+    //或批量修改
+//    productFlavors {
+//        xiaomi {}
+//        wandoujia {}
+//    }
+//    productFlavors.all {
+//        flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+//    }
+
+    //-----------------设置开发环境和生产环境-----------------
+    /**
+     * defaultConfig{}中的属性是所有Flavor共享的，Flavor也可以重写defaultConfig中的属性
+     * 在打包app之前，Android插件会合并main中的代码和flavor中的代码。当然，依赖项目也可以提供额外的资源，它们也会被合并。
+     * 合并的优先级是这样的：
+     * BuildType>Flavor>Main>Dependencies
+     * 如果一个资源在main中和在flavor中定义了，那么那个在flavor中的资源有更高的优先级。这样那个在flavor文件夹中的资源将会被打包到apk。而在依赖项目申明的资源总是拥有最低优先级。
+     * 一个flavor对应一个sourceSet
+     */
+    productFlavors {
+        dev {
+            // dev utilizes minSDKVersion = 21 to allow the Android gradle plugin
+            // to pre-dex each module and produce an APK that can be tested on
+            // Android Lollipop without time consuming dex merging processes.
+            minSdkVersion 21
+            applicationId 'com.study.gradle.dev'
+            proguardFile 'D:/terry/workspace/android_studio/open_sources/Gradle/Study_Gradle/app/proguard-rules.pro'
+            targetSdkVersion 25
+            testApplicationId 'com.study.gradle.dev.test'
+            versionCode 10
+            versionName '1.0'
+            versionNameSuffix 'dev'
+
+            //替换manifest中的占位符
+            manifestPlaceholders = [
+                    icon: "@mipmap/ic_launcher"
+            ]
+        }
+        // 发布
+        prod {
+            // The actual minSdkVersion for the application.
+            minSdkVersion config.minSdkVersion
+            //替换manifest中的占位符
+            manifestPlaceholders = [
+                    icon: "@mipmap/ic_launcher_prod"
+            ]
+        }
+    }
+
+    //-----------------移除lint检查的error-----------------
+
+    lintOptions {
+        abortOnError false
+    }
+
+    //-----------------签名配置-----------------
+    signingConfigs {
+        //debug配置是as默认的，即使用的debug.keystore
+        debug {
+            storeFile file(STORE_FILE_PATH) //定义在gradle.properties中的
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+        }
+        release {
+            storeFile file(STORE_FILE_PATH)
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+        }
+    }
+//-----------------配置资源目录-----------------
+    sourceSets {
+        main {
+        }
+    }
+}
+/**
+ * 定义局部变量
+ */
+ext {
+    junitVersion = '4.12'
+}
+
+dependencies {
+    //编译libs目录下的所有jar包
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile "junit:junit:$junitVersion"
+    //
+    compile 'com.android.support:multidex:1.0.0'
+    compile config.libSupportV4
+    /**
+     * 不同Flavor的依赖
+     */
+    //    debugCompile ""    //debug的依赖
+    //对于flavor=dev的依赖   选择BuildVariants=devDebug或devRelease 构建下会编译依赖库
+    devCompile 'com.google.guava:guava:21.0-rc2'
+//    devDebugCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devDebug下会编译依赖库
+//    devReleaseCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devRelease下会编译依赖库
+
+    //对于flavor=prod的依赖 选择BuildVariants=devDebug或devRelease 构建下会编译依赖库
+    prodCompile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
+
+    /**
+     * module依赖
+     * 1、直接依赖源码，优点是修改了代码可以马上生效，缺点是编译速度慢。
+     * 2、aar依赖，优点是编译速度快，缺点是修改了代码需要重新生成aar。
+     *  开发中，修改代码时就依赖源码，修改完毕后，依赖aar，然后重新build。
+     *  编译完成后，在app/build/intermediates/exploded-aar/ 就可以看见我们引用的aar包内容了
+     */
+    //1.直接依赖源码
+    //        compile project(':lib_uikit')
+    //2.依赖aar
+    compile(name: 'lib_uikit', ext: 'aar')
+
+    /**
+     * 聚合依赖多个库
+     * 有时候一些库是一并依赖的，剔除也是要一并剔除的，这样别的开发者就知道哪些库是有相关性的，在删除的时候也比较方便。
+     */
+    compile([
+            'com.github.tianzhijiexian:logger:2e5da00f0f',
+            'com.jakewharton.timber:timber:4.1.2'
+    ])
+
+    /**
+     * exclude关键字
+     * 剔除某个组织或某个库
+     */
+    // 1.剔除整个组织的库
+    compile('com.facebook.fresco:animated-webp:1.0') {
+        exclude group: 'com.android.support' // 仅仅写组织名称
+    }
+    //2.剔除某个库
+    compile('com.android.support:appcompat-v7:25.0.1') {
+        exclude group: 'com.android.support', module: 'support-annotations' // 写全称
+        exclude group: 'com.android.support', module: 'support-compat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-vector-drawable'
+    }
+
+}
+repositories {
+    flatDir {
+        dirs 'libs' //this way we can find the .aar file in libs folder
+    }
+}

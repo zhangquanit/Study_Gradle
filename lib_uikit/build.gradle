@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+def config = rootProject.ext;
+android {
+    compileSdkVersion config.compileSdkVersion
+    buildToolsVersion config.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion config.minSdkVersion
+        targetSdkVersion config.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+    }
+    buildTypes {
+        release {
+            /**
+             * 有很多库是需要进行混淆配置的，但让使用者配置混淆文件的方式总是不太友好，
+             * consumerProguardFiles的出现可以让库作者在库中定义混淆参数，从而不需要调用者自己去定义。
+             * 打包工具会将*.pro文件打包进入aar中，库混淆时候会自动使用此混淆配置文件。
+             * 以consumerProguardFiles方式加入的混淆具有以下特性：
+             *   1.pro文件会包含在aar文件中
+             2.这些pro配置会在混淆的时候被使用
+             3.此配置针对此aar进行混淆配置
+             4.此配置只对库文件有效，对应用程序无效
+             */
+            consumerProguardFiles 'consumer-proguard-rules.pro' // 自定义混淆配置
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile config.libSupportAppcompat
+}
+/**
+ * 更改生成文件的位置
+ * 将生成的aar文件都放在特定的目录(app/libs/lib_uikit.aar)
+ * 开发中，一般将生成的aar放到主应用Module的libs目录下
+ *
+ * 注意：apk等文件也可以进行类似的处理
+ */
+android.libraryVariants.all { variant ->
+    variant.outputs.each { output ->
+        if (output.outputFile != null && output.outputFile.name.endsWith('.aar')) {
+            def name = "${rootDir}/app/libs/lib_uikit.aar"
+            output.outputFile = file(name)
+        }
+    }
+}
