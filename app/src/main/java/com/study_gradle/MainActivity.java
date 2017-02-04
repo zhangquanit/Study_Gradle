@@ -1,7 +1,6 @@
 package com.study_gradle;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -47,7 +46,7 @@ public class MainActivity extends Activity {
 
 
         //打开
-        startActivity(new Intent(this,ChildActivity.class));
+//        startActivity(new Intent(this,ChildActivity.class));
 
 
 //        new OneClass().test();

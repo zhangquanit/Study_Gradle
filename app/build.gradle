@@ -5,7 +5,16 @@ def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
 
+//使用公共函数
+if(isJenkins()){
+  apply plugin:'com.fucknmb.tinker'
+    tinker{
+            //一系列的配置项
+    }
+}
+
 def config = rootProject.ext;
+
 android {
     compileSdkVersion config.compileSdkVersion
     buildToolsVersion config.buildToolsVersion
@@ -253,6 +262,13 @@ dependencies {
      * provided: 仅在编译的时候需要，但是在运行时不需要依赖,就用providedCompile
      */
     provided 'javax.annotation:jsr250-api:1.0'
+
+    /**
+     * 复用函数
+     */
+    if (usePercent()) {
+        compile 'com.android.support:recyclerview-v7:25.1.0'
+    }
 
 }
 repositories {

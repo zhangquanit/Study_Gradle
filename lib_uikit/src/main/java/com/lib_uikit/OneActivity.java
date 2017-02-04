@@ -1,6 +1,9 @@
 package com.lib_uikit;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 /**
@@ -13,5 +16,15 @@ public class OneActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.one);
         System.out.println("BuildConfig.DEBUG"+BuildConfig.DEBUG);
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                
+                abortBroadcast();
+            }
+        };
+
     }
 }
