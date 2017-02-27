@@ -4,3 +4,8 @@ GitHub：https://github.com/alibaba/freeline
 2、JRebel
 对于 Android 来说，JRebel 提供了一款 Android Studio 插件来帮助你快速调试你的应用程序，安装起来很简单：
 打开 Preference -> Plugins -> Browse Repositories ，搜索 JRebel ，直接点击安装。
+
+如何将多个library放到同一个目录下，比如library？
+1.root工程下新建library文件夹
+2.将一个module拖进library文件夹
+3.在setting.gradle中将原有的:moduleName改为:library:moduleName，同步一下。完成。
