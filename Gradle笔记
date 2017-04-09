@@ -9,3 +9,7 @@ GitHub：https://github.com/alibaba/freeline
 1.root工程下新建library文件夹
 2.将一个module拖进library文件夹
 3.在setting.gradle中将原有的:moduleName改为:library:moduleName，同步一下。完成。
+
+Gradle学习系列
+http://www.cnblogs.com/CloudTeng/p/3417762.html
+http://blog.csdn.net/yanbober/article/details/49314255
