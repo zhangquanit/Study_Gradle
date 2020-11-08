@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 /**
  * @author 张全
  */
 
-public class OneActivity extends Activity {
+public class OneActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -7,15 +7,17 @@ apply from: 'buildsystem/dependencies.gradle'
 apply from: 'buildsystem/common_function.gradle'
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath "com.android.tools.build:gradle:4.0.1"
     }
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
         /**
          设置第三方maven仓库，主要是配置url这个参数

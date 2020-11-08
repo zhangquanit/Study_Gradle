@@ -7,10 +7,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 /**
  * @author 张全
  */
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

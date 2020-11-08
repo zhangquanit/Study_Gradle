@@ -29,15 +29,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile config.libSupportAppcompat
+    implementation fileTree(include: ['*.jar', '*.aar'], exclude: ['android-support*.jar'], dir: 'libs')
+    implementation config.appCompat
 }
 /**
  * 更改生成文件的位置
@@ -46,11 +46,11 @@ dependencies {
  *
  * 注意：apk等文件也可以进行类似的处理
  */
-android.libraryVariants.all { variant ->
-    variant.outputs.each { output ->
-        if (output.outputFile != null && output.outputFile.name.endsWith('.aar')) {
-            def name = "${rootDir}/app/libs/lib_uikit.aar"
-            output.outputFile = file(name)
-        }
-    }
-}
+//android.libraryVariants.all { variant ->
+//    variant.outputs.each { output ->
+//        if (output.outputFile != null && output.outputFile.name.endsWith('.aar')) {
+//            def name = "${rootDir}/app/libs/lib_uikit.aar"
+//            output.outputFile = file(name)
+//        }
+//    }
+//}

@@ -6,10 +6,10 @@ def releaseTime() {
 }
 
 //使用公共函数
-if(isJenkins()){
-  apply plugin:'com.fucknmb.tinker'
-    tinker{
-            //一系列的配置项
+if (isJenkins()) {
+    apply plugin: 'com.fucknmb.tinker'
+    tinker {
+        //一系列的配置项
     }
 }
 
@@ -21,7 +21,7 @@ android {
 
     useLibrary "org.apache.http.legacy"  //支持httpclient请求
 
-    //属于Flavors的默认配置。
+    //属于Flavors的默认配置。所有flavor共享
     defaultConfig {
         //应用包名  注意与Manifest.xml文件中packagenName的区别
         applicationId "com.study.gradle" //默认包名
@@ -30,10 +30,6 @@ android {
         targetSdkVersion config.targetSdkVersion
         versionCode 1
         versionName "1.0"
-
-        // dex突破65535的限制
-        multiDexEnabled true
-
 
 //        ndk {
 //            // 设置支持的 SO 库构架
@@ -98,11 +94,6 @@ android {
         rtm.initWith(buildTypes.release) // 继承release的配置
         rtm {}
     }
-    //-----------------设置java版本-----------------
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
 
     //-----------------多渠道打包-----------------
     /**
@@ -113,6 +104,7 @@ android {
 
      第二步 统一替换AndroidManifest中的占位符
      */
+    flavorDimensions "channel"
 //    productFlavors {
 //        xiaomi {
 //            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "xiaomi"]
@@ -146,7 +138,7 @@ android {
             // Android Lollipop without time consuming dex merging processes.
             minSdkVersion 21
             applicationId 'com.study.gradle.dev'
-            targetSdkVersion 25
+            targetSdkVersion 28
             versionCode 10
             versionName '1.0'
             versionNameSuffix 'dev'
@@ -167,11 +159,6 @@ android {
         }
     }
 
-    //-----------------移除lint检查的error-----------------
-
-    lintOptions {
-        abortOnError false
-    }
 
     //-----------------签名配置-----------------
     signingConfigs {
@@ -189,11 +176,98 @@ android {
             keyPassword KEY_PASSWORD
         }
     }
-//-----------------配置资源目录-----------------
+    //-----------------配置资源目录-----------------
     sourceSets {
         main {
+            jniLibs.srcDirs = ['libs']
         }
     }
+
+    //-----------------lint检查配置-----------------
+    lintOptions {
+// true--关闭lint报告的分析进度
+        quiet true
+// true--错误发生后停止gradle构建
+        abortOnError false
+// true--只报告error
+        ignoreWarnings true
+// 如果为 true，则当有错误时会显示文件的全路径或绝对路径 (默认情况下为true)
+//      absolutePaths true
+// 如果为 true，则检查所有的问题，包括默认不检查问题
+        checkAllWarnings true
+//true--所有warning当做error
+        warningsAsErrors true
+// 关闭指定问题检查
+        disable 'TypographyFractions', 'TypographyQuotes'
+// 打开指定问题检查
+        enable 'RtlHardcoded', 'RtlCompat', 'RtlEnabled'
+// 仅检查指定问题
+        check 'NewApi', 'InlinedApi'
+// 如果为true，则在错误报告的输出中不包括源代码行号
+        noLines true
+// 如果为 true，则对一个错误的问题显示它所在的所有地方，而不会截短列表，等等。
+        showAll true
+// 重置 lint 配置（使用默认的严重性等设置）。
+//        lintConfig file("default-lint.xml")
+// 如果为 true，生成一个问题的纯文本报告（默认为false）
+//        textReport true
+// 配置写入输出结果的位置；它可以是一个文件或 “stdout”（标准输出）
+//        textOutput 'stdout'
+// 如果为真，会生成一个XML报告，以给Jenkins之类的使用
+//        xmlReport false
+// 用于写入报告的文件（如果不指定，默认为lint-results.xml）
+//        xmlOutput file("lint-report.xml")
+// 如果为真，会生成一个HTML报告（包括问题的解释，存在此问题的源码，等等）
+//        htmlReport true
+// 写入报告的路径，它是可选的（默认为构建目录下的 lint-results.html ）
+//        htmlOutput file("lint-report.html")
+
+// 设置为 true， 将使所有release 构建都以issus的严重性级别为fatal（severity=false）的设置来运行lint
+// 并且，如果发现了致命（fatal）的问题，将会中止构建（由上面提到的 abortOnError 控制）
+        checkReleaseBuilds true
+// 设置给定问题的严重级别（severity）为fatal （这意味着他们将会
+// 在release构建的期间检查 （即使 lint 要检查的问题没有包含在代码中)
+        fatal 'NewApi', 'InlineApi'
+// 设置给定问题的严重级别为error
+        error 'Wakelock', 'TextViewEdits'
+// 设置给定问题的严重级别为warning
+        warning 'ResourceAsColor'
+// 设置给定问题的严重级别（severity）为ignore （和不检查这个问题一样）
+        ignore 'TypographyQuotes'
+    }
+
+    //-----------------dexOptions-----------------
+    /**
+     * 这个配置用于控制我们代码编译打包成dex的细节。
+     */
+    dexOptions {
+        javaMaxHeapSize "4g"  //设置运行 dx 的最大内存
+    }
+
+    //-----------------设置java版本-----------------
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    //-----------------packagingOptions-----------------
+    /**
+     * packagingOptions常见的设置项有exclude、pickFirst、doNotStrip、merge。
+     * 1. exclude，过滤掉某些文件或者目录不添加到APK中，作用于APK，不能过滤aar和jar中的内容。
+     * 2. pickFirst，匹配到多个相同文件，只提取第一个，作用于APK，不能过滤aar和jar中的文件。
+     * 3. doNotStrip，可以设置某些动态库不被优化压缩。
+     * 4. merge，将匹配的文件都添加到APK中，和pickFirst有些相反，会合并所有文件。
+     */
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
+
+
 }
 /**
  * 定义局部变量
@@ -203,23 +277,31 @@ ext {
 }
 
 dependencies {
+    /**
+     * api、implementation的区别(假如A依赖B B依赖C  )
+     * api依赖可以传递 则A可以使用C中的代码，当C的代码发生改变，需要重新编译C,B，A
+     * implementation会隐藏依赖，则A无法使用C中的代码，目的减少build时间，当C的代码发生改变，只需要重新编译C,B
+     */
     //编译libs目录下的所有jar包
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile "junit:junit:$junitVersion"
-    //
-    compile 'com.android.support:multidex:1.0.0'
-    compile config.libSupportV4
+    implementation fileTree(include: ['*.jar', '*.aar'], exclude: ['android-support*.jar'], dir: 'libs')
+    testImplementation "junit:junit:$junitVersion"
+
+    //通用依赖
+    implementation config.supportV4
+
+    //    debugImplementation ""    //debug的依赖
+    //    releaseImplementation ""    //release的依赖
+
     /**
      * 不同Flavor的依赖
      */
-    //    debugCompile ""    //debug的依赖
     //对于flavor=dev的依赖   选择BuildVariants=devDebug或devRelease 构建下会编译依赖库
-//    devCompile 'com.google.guava:guava:21.0-rc2'
-//    devDebugCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devDebug下会编译依赖库
-//    devReleaseCompile 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devRelease下会编译依赖库
+//    devImplementation 'com.google.guava:guava:21.0-rc2'
+//    devDebugImplementation 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devDebug下会编译依赖库
+//    devReleaseImplementation 'com.google.guava:guava:21.0-rc2' //选择BuildVariants=devRelease下会编译依赖库
 
     //对于flavor=prod的依赖 选择BuildVariants=devDebug或devRelease 构建下会编译依赖库
-    prodCompile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
+//    prodImplementation 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
 
     /**
      * module依赖
@@ -229,15 +311,15 @@ dependencies {
      *  编译完成后，在app/build/intermediates/exploded-aar/ 就可以看见我们引用的aar包内容了
      */
     //1.直接依赖源码
-    //        compile project(':lib_uikit')
+    implementation project(':lib_uikit')
     //2.依赖aar
-    compile(name: 'lib_uikit', ext: 'aar')
+//    implementation(name: 'lib_uikit', ext: 'aar')
 
     /**
      * 聚合依赖多个库
      * 有时候一些库是一并依赖的，剔除也是要一并剔除的，这样别的开发者就知道哪些库是有相关性的，在删除的时候也比较方便。
      */
-    compile([
+    implementation([
             'com.github.tianzhijiexian:logger:2e5da00f0f',
             'com.jakewharton.timber:timber:4.1.2'
     ])
@@ -247,11 +329,11 @@ dependencies {
      * 剔除某个组织或某个库
      */
     // 1.剔除整个组织的库
-    compile('com.facebook.fresco:animated-webp:1.0') {
+    implementation('com.facebook.fresco:animated-webp:1.0') {
         exclude group: 'com.android.support' // 仅仅写组织名称
     }
     //2.剔除某个库
-    compile('com.android.support:appcompat-v7:25.0.1') {
+    implementation(config.appCompat) {
         exclude group: 'com.android.support', module: 'support-annotations' // 写全称
         exclude group: 'com.android.support', module: 'support-compat'
         exclude group: 'com.android.support', module: 'support-v4'
@@ -259,15 +341,15 @@ dependencies {
     }
 
     /**
-     * provided: 仅在编译的时候需要，但是在运行时不需要依赖,就用providedCompile
+     * compileOnly: 仅在编译的时候需要，但是在运行时不需要依赖
      */
-    provided 'javax.annotation:jsr250-api:1.0'
+    compileOnly 'javax.annotation:jsr250-api:1.0'
 
     /**
      * 复用函数
      */
     if (usePercent()) {
-        compile 'com.android.support:recyclerview-v7:25.1.0'
+        implementation config.recyclerView
     }
 
 }

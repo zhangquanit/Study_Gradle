@@ -9,7 +9,7 @@ import com.prod.ProdClass;
  * @author 张全
  */
 
-public class ChildActivity extends Activity {
+public class ChildActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
