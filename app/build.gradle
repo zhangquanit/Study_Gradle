@@ -319,19 +319,19 @@ dependencies {
      * 聚合依赖多个库
      * 有时候一些库是一并依赖的，剔除也是要一并剔除的，这样别的开发者就知道哪些库是有相关性的，在删除的时候也比较方便。
      */
-    implementation([
-            'com.github.tianzhijiexian:logger:2e5da00f0f',
-            'com.jakewharton.timber:timber:4.1.2'
-    ])
+//    implementation([
+//            'com.github.tianzhijiexian:logger:2e5da00f0f',
+//            'com.jakewharton.timber:timber:4.1.2'
+//    ])
 
     /**
      * exclude关键字
      * 剔除某个组织或某个库
      */
     // 1.剔除整个组织的库
-    implementation('com.facebook.fresco:animated-webp:1.0') {
-        exclude group: 'com.android.support' // 仅仅写组织名称
-    }
+//    implementation('com.facebook.fresco:animated-webp:1.0') {
+//        exclude group: 'com.android.support' // 仅仅写组织名称
+//    }
     //2.剔除某个库
     implementation(config.appCompat) {
         exclude group: 'com.android.support', module: 'support-annotations' // 写全称
@@ -343,7 +343,7 @@ dependencies {
     /**
      * compileOnly: 仅在编译的时候需要，但是在运行时不需要依赖
      */
-    compileOnly 'javax.annotation:jsr250-api:1.0'
+//    compileOnly 'javax.annotation:jsr250-api:1.0'
 
     /**
      * 复用函数
