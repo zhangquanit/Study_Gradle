@@ -358,3 +358,31 @@ repositories {
         dirs 'libs' //this way we can find the .aar file in libs folder
     }
 }
+
+//------------------task
+
+
+//-------------------插件开发
+
+
+//class MyPluginExtension {
+//    String message = "hello world"
+//}
+//
+//class MyPlugin implements Plugin<Project> {
+//
+//    @Override
+//    void apply(Project project) {
+//        //自定义配置的DSL
+//        def extension = project.extensions.create("greeting", MyPluginExtension)
+//        //创建了一个名为say的task
+//        project.task("say") {
+//            doLast { println(extension.message) }
+//        }
+//    }
+//}
+//
+//apply plugin: MyPlugin
+//greeting {
+//    message = "hello,this is my pluginß"
+//}
