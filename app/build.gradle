@@ -310,10 +310,14 @@ dependencies {
      *  开发中，修改代码时就依赖源码，修改完毕后，依赖aar，然后重新build。
      *  编译完成后，在app/build/intermediates/exploded-aar/ 就可以看见我们引用的aar包内容了
      */
-    //1.直接依赖源码
-    implementation project(':lib_uikit')
-    //2.依赖aar
+    if (!dependOnAAR) { //dependOnAAR定义在gradle.properties
+        //1.直接依赖源码
+        implementation project(':lib_uikit')
+    } else {
+        //2.依赖aar
 //    implementation(name: 'lib_uikit', ext: 'aar')
+    }
+
 
     /**
      * 聚合依赖多个库

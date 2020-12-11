@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.lib_uikit.OneClass;
+
 /**
  * @author 张全
  */
@@ -47,11 +49,12 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(data.toString());
 
 
+
         //打开
 //        startActivity(new Intent(this,ChildActivity.class));
 
 
-//        new OneClass().test();
+        new OneClass().test();
     }
 
     private void aarTest() {
